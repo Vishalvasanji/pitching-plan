@@ -1,0 +1,126 @@
+:root {
+  color-scheme: light dark;
+
+  /* iOS system accent colors (light) */
+  --blue: #007aff;
+  --green: #34c759;
+  --orange: #ff9f0a;
+  --red: #ff3b30;
+
+  /* surfaces */
+  --bg: #f2f2f7;
+  --card-bg: #ffffff;
+  --card-bg-2: #f7f7fa;
+  --elevated: #ffffff;
+
+  /* text */
+  --label: #1c1c1e;
+  --secondary-label: rgba(60, 60, 67, 0.6);
+  --tertiary-label: rgba(60, 60, 67, 0.32);
+  --separator: rgba(60, 60, 67, 0.16);
+
+  /* fills */
+  --fill: rgba(120, 120, 128, 0.12);
+  --fill-2: rgba(120, 120, 128, 0.18);
+  --fill-strong: rgba(118, 118, 128, 0.2);
+
+  /* badge tints */
+  --green-tint: rgba(52, 199, 89, 0.16);
+  --green-ink: #1f8a3b;
+  --orange-tint: rgba(255, 159, 10, 0.18);
+  --orange-ink: #b56a00;
+  --red-tint: rgba(255, 59, 48, 0.16);
+  --red-ink: #d22219;
+  --blue-tint: rgba(0, 122, 255, 0.14);
+  --gray-tint: rgba(120, 120, 128, 0.14);
+
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.07);
+  --shadow-pop: 0 12px 44px rgba(0, 0, 0, 0.22);
+  --shadow-seg: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 1px rgba(0, 0, 0, 0.06);
+
+  --radius-lg: 18px;
+  --radius: 14px;
+  --radius-sm: 10px;
+  --radius-pill: 999px;
+
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Segoe UI',
+    system-ui, sans-serif;
+}
+
+/* Dark palette — applied for system-dark (unless forced light) and explicit dark. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --blue: #0a84ff;
+    --green: #30d158;
+    --orange: #ff9f0a;
+    --red: #ff453a;
+
+    --bg: #000000;
+    --card-bg: #1c1c1e;
+    --card-bg-2: #2c2c2e;
+    --elevated: #1c1c1e;
+
+    --label: #ffffff;
+    --secondary-label: rgba(235, 235, 245, 0.6);
+    --tertiary-label: rgba(235, 235, 245, 0.32);
+    --separator: rgba(84, 84, 88, 0.55);
+
+    --fill: rgba(120, 120, 128, 0.24);
+    --fill-2: rgba(120, 120, 128, 0.32);
+    --fill-strong: rgba(118, 118, 128, 0.36);
+
+    --green-tint: rgba(48, 209, 88, 0.22);
+    --green-ink: #5fe07f;
+    --orange-tint: rgba(255, 159, 10, 0.26);
+    --orange-ink: #ffc266;
+    --red-tint: rgba(255, 69, 58, 0.26);
+    --red-ink: #ff8a82;
+    --blue-tint: rgba(10, 132, 255, 0.26);
+    --gray-tint: rgba(120, 120, 128, 0.26);
+
+    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.5);
+    --shadow-pop: 0 12px 44px rgba(0, 0, 0, 0.7);
+    --shadow-seg: 0 1px 3px rgba(0, 0, 0, 0.5);
+  }
+}
+
+:root[data-theme='dark'] {
+  --blue: #0a84ff;
+  --green: #30d158;
+  --orange: #ff9f0a;
+  --red: #ff453a;
+
+  --bg: #000000;
+  --card-bg: #1c1c1e;
+  --card-bg-2: #2c2c2e;
+  --elevated: #1c1c1e;
+
+  --label: #ffffff;
+  --secondary-label: rgba(235, 235, 245, 0.6);
+  --tertiary-label: rgba(235, 235, 245, 0.32);
+  --separator: rgba(84, 84, 88, 0.55);
+
+  --fill: rgba(120, 120, 128, 0.24);
+  --fill-2: rgba(120, 120, 128, 0.32);
+  --fill-strong: rgba(118, 118, 128, 0.36);
+
+  --green-tint: rgba(48, 209, 88, 0.22);
+  --green-ink: #5fe07f;
+  --orange-tint: rgba(255, 159, 10, 0.26);
+  --orange-ink: #ffc266;
+  --red-tint: rgba(255, 69, 58, 0.26);
+  --red-ink: #ff8a82;
+  --blue-tint: rgba(10, 132, 255, 0.26);
+  --gray-tint: rgba(120, 120, 128, 0.26);
+
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --shadow-pop: 0 12px 44px rgba(0, 0, 0, 0.7);
+  --shadow-seg: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
