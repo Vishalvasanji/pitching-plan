@@ -65,6 +65,17 @@ describe('App — end-to-end wiring', () => {
     expect(screen.getByText(/5 games left to win it all/i)).toBeInTheDocument();
   });
 
+  it('lets you enter an exact pitch count', () => {
+    render(<App />);
+    fireEvent.click(screen.getAllByText('+ Add pitcher')[0]);
+    const dialog = screen.getByRole('dialog');
+    fireEvent.click(within(dialog).getByText('Alek Biletnikoff'));
+    fireEvent.change(within(dialog).getByLabelText('Pitches'), { target: { value: '47' } });
+    fireEvent.click(within(dialog).getByRole('button', { name: /Add 47 pitches/i }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Availability' }));
+    expect(screen.getByTitle(/47 pitches/i)).toBeInTheDocument();
+  });
+
   it('adding a pitcher on the Plan tab flows to the Availability table', () => {
     render(<App />);
     // Add 25 pitches to the first game (Day 1 pool) on the Plan tab.

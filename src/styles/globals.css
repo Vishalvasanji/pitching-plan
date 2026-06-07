@@ -470,12 +470,25 @@ button {
 .stepper__btn:disabled {
   color: var(--tertiary-label);
 }
-.stepper__val {
-  min-width: 40px;
+.stepper__input {
+  width: 46px;
   text-align: center;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
+  border: none;
+  background: transparent;
+  color: var(--label);
+  padding: 6px 0;
+  -moz-appearance: textfield;
+}
+.stepper__input:focus {
+  outline: none;
+}
+.stepper__input::-webkit-outer-spin-button,
+.stepper__input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 /* ---------- badges ---------- */
