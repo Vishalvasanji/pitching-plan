@@ -19,6 +19,12 @@ describe('App — end-to-end wiring', () => {
     expect(screen.getByText('#6 seed')).toBeInTheDocument();
   });
 
+  it('labels the championship game on the bracket path', () => {
+    render(<App />);
+    // The Red worst-case path ends at GM40, the championship game.
+    expect(screen.getByText(/Championship/i)).toBeInTheDocument();
+  });
+
   it('shows the roster on the Availability tab', () => {
     render(<App />);
     // Roster lives on the Availability tab, not the default Plan tab.

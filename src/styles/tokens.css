@@ -33,6 +33,9 @@
   --red-ink: #d22219;
   --blue-tint: rgba(0, 122, 255, 0.14);
   --gray-tint: rgba(120, 120, 128, 0.14);
+  --champ-tint: rgba(245, 197, 24, 0.2);
+  --champ-ink: #8a6100;
+  --champ-accent: #f5c518;
 
   --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.07);
   --shadow-pop: 0 12px 44px rgba(0, 0, 0, 0.22);
@@ -84,6 +87,9 @@
     --red-ink: #ff8a82;
     --blue-tint: rgba(10, 132, 255, 0.26);
     --gray-tint: rgba(120, 120, 128, 0.26);
+    --champ-tint: rgba(255, 214, 10, 0.22);
+    --champ-ink: #ffd60a;
+    --champ-accent: #ffd60a;
 
     --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.5);
     --shadow-pop: 0 12px 44px rgba(0, 0, 0, 0.7);
@@ -119,6 +125,9 @@
   --red-ink: #ff8a82;
   --blue-tint: rgba(10, 132, 255, 0.26);
   --gray-tint: rgba(120, 120, 128, 0.26);
+  --champ-tint: rgba(255, 214, 10, 0.22);
+  --champ-ink: #ffd60a;
+  --champ-accent: #ffd60a;
 
   --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.5);
   --shadow-pop: 0 12px 44px rgba(0, 0, 0, 0.7);

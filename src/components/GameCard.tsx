@@ -11,7 +11,7 @@ export function GameCard({ pg, onAdd }: { pg: PathGame; onAdd: () => void }) {
   const showToggle = isBracket && (role === 'current' || role === 'played');
 
   return (
-    <div className={`gamecard ${projected ? 'gamecard--projected' : ''}`}>
+    <div className={`gamecard ${projected ? 'gamecard--projected' : ''} ${game.isChampionship ? 'gamecard--champ' : ''}`}>
       <div className="gamecard__body">
         <div className="gamecard__top">
           <span className="gamecard__time">{game.time}</span>
@@ -21,6 +21,7 @@ export function GameCard({ pg, onAdd }: { pg: PathGame; onAdd: () => void }) {
             <span className="gamecard__rolepill">Projected</span>
           ) : null}
         </div>
+        {game.isChampionship && <div className="champ-tag">🏆 Championship</div>}
         <div className="gamecard__matchup">{gameMatchup(game)}</div>
         <div className="gamecard__meta">{game.field}</div>
 

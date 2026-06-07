@@ -64,8 +64,11 @@ export function RosterTable() {
                       <span
                         key={pg.game.id}
                         className={`gchip ${pg.role === 'projected' ? 'gchip--projected' : ''}`}
-                        title={`${pg.game.time} · ${gameMatchupShort(pg.game)} · ${pg.game.field}`}
+                        title={`${pg.game.time} · ${gameMatchupShort(pg.game)} · ${pg.game.field}${
+                          pg.game.isChampionship ? ' · Championship' : ''
+                        }`}
                       >
+                        {pg.game.isChampionship && '🏆 '}
                         <span className="gchip__time">{shortTime(pg.game.time)}</span>{' '}
                         {gameMatchupShort(pg.game)}
                       </span>

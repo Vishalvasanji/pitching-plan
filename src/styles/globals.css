@@ -349,6 +349,24 @@ button {
   white-space: nowrap;
 }
 
+.gamecard--champ {
+  box-shadow: inset 3px 0 0 var(--champ-accent);
+}
+.champ-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--champ-ink);
+  background: var(--champ-tint);
+  border-radius: var(--radius-pill);
+  padding: 3px 9px;
+  margin-bottom: 8px;
+}
+
 .gamecard__pitchers {
   margin-top: var(--sp-3);
   display: flex;
