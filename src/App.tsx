@@ -81,13 +81,14 @@ export function App() {
           <RosterTable />
           <div className="legend">
             <span>
-              <i style={{ background: 'var(--green)', borderRadius: '50%' }} />
+              <i style={{ background: 'var(--green)' }} />
               Available
             </span>
             <span>
-              <i style={{ background: 'var(--red)', borderRadius: '50%' }} />
+              <i style={{ background: 'var(--red)' }} />
               Not available (resting or pitching)
             </span>
+            <span>Number in a cell = pitches thrown that day</span>
           </div>
         </section>
       )}

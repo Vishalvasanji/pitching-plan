@@ -50,14 +50,19 @@ export function RosterTable() {
                 {DAYS.map((d) => {
                   const s = st[d.index - 1];
                   const available = s.kind === 'available';
+                  const bad = s.violations.length > 0;
                   const title = cellTitle(s);
                   return (
                     <td key={d.index} className="col-dot">
-                      <span
-                        className={`availdot ${available ? 'availdot--yes' : 'availdot--no'}`}
+                      <div
+                        className={`availcell ${available ? 'availcell--yes' : 'availcell--no'} ${
+                          bad ? 'availcell--bad' : ''
+                        }`}
                         title={title}
                         aria-label={title}
-                      />
+                      >
+                        {s.pitches > 0 ? s.pitches : ''}
+                      </div>
                     </td>
                   );
                 })}

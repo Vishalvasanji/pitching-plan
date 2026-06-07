@@ -70,11 +70,10 @@ button {
 }
 
 .section__title {
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--secondary-label);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--label);
   margin: 0 0 var(--sp-3);
   padding-bottom: var(--sp-2);
   border-bottom: 1px solid var(--separator);
@@ -660,8 +659,12 @@ button {
   position: static;
 }
 .col-dot {
-  width: 48px;
+  width: 42px;
   text-align: center;
+}
+.rtable td.col-dot,
+.rtable th.col-dot {
+  padding: 3px 4px;
 }
 .rtable--compact thead .col-dot {
   font-size: 12px;
@@ -669,18 +672,25 @@ button {
   letter-spacing: 0.02em;
   color: var(--secondary-label);
 }
-.availdot {
-  display: inline-block;
-  width: 13px;
-  height: 13px;
-  border-radius: 50%;
-  vertical-align: middle;
+.availcell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 30px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
 }
-.availdot--yes {
+.availcell--yes {
   background: var(--green);
 }
-.availdot--no {
+.availcell--no {
   background: var(--red);
+}
+.availcell--bad {
+  box-shadow: 0 0 0 2px var(--champ-accent);
 }
 
 /* roster status cell */
