@@ -81,20 +81,12 @@ export function App() {
           <RosterTable />
           <div className="legend">
             <span>
-              <i style={{ background: 'var(--green)' }} />
+              <i style={{ background: 'var(--green)', borderRadius: '50%' }} />
               Available
             </span>
             <span>
-              <i style={{ background: 'var(--fill-strong)' }} />
-              Pitched (count)
-            </span>
-            <span>
-              <i style={{ background: 'var(--orange)' }} />
-              Resting
-            </span>
-            <span>
-              <i style={{ background: 'var(--red)' }} />
-              Rule violation
+              <i style={{ background: 'var(--red)', borderRadius: '50%' }} />
+              Not available (resting or pitching)
             </span>
           </div>
         </section>

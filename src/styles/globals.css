@@ -645,6 +645,44 @@ button {
   color: var(--tertiary-label);
 }
 
+/* Compact availability grid: name + W/TH/F/S with green/red dots (no scroll) */
+.rtable--compact {
+  min-width: 0;
+  width: 100%;
+}
+.rtable--compact .col-name {
+  position: static;
+  min-width: 0;
+  width: auto;
+  box-shadow: none;
+}
+.rtable--compact thead .col-name {
+  position: static;
+}
+.col-dot {
+  width: 48px;
+  text-align: center;
+}
+.rtable--compact thead .col-dot {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--secondary-label);
+}
+.availdot {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  vertical-align: middle;
+}
+.availdot--yes {
+  background: var(--green);
+}
+.availdot--no {
+  background: var(--red);
+}
+
 /* roster status cell */
 .cell {
   display: flex;

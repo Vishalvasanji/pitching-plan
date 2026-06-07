@@ -55,9 +55,8 @@ describe('App — end-to-end wiring', () => {
     const dialog = screen.getByRole('dialog');
     fireEvent.click(within(dialog).getByText('Alek Biletnikoff'));
     fireEvent.click(within(dialog).getByRole('button', { name: /Add 25 pitches/i }));
-    // Verify it on the Availability tab.
+    // Verify it on the Availability tab (the day's dot carries the detail).
     fireEvent.click(screen.getByRole('tab', { name: 'Availability' }));
-    expect(screen.getAllByText('25').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('pitches').length).toBeGreaterThan(0);
+    expect(screen.getByTitle(/25 pitches/i)).toBeInTheDocument();
   });
 });
