@@ -9,14 +9,23 @@ beforeEach(() => {
 });
 
 describe('App — end-to-end wiring', () => {
-  it('renders the roster and the Red worst-case headline (6 games)', () => {
+  it('opens on the Plan tab with the Red worst-case headline (6 games)', () => {
     render(<App />);
     expect(screen.getByText('Pitching Plan')).toBeInTheDocument();
-    expect(screen.getByText('Alek Biletnikoff')).toBeInTheDocument();
+    expect(screen.getByText('Pool Play')).toBeInTheDocument();
+    expect(screen.getByText('Bracket Play')).toBeInTheDocument();
     // Red #6 worst case = 6 total games to win it all.
     expect(screen.getByText(/6 games left to win it all/i)).toBeInTheDocument();
-    // assumed seed caption (exact match → only the caption's <strong>, not a matchup)
     expect(screen.getByText('#6 seed')).toBeInTheDocument();
+  });
+
+  it('shows the roster on the Availability tab', () => {
+    render(<App />);
+    // Roster lives on the Availability tab, not the default Plan tab.
+    expect(screen.queryByText('Alek Biletnikoff')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('tab', { name: 'Availability' }));
+    expect(screen.getByText('Alek Biletnikoff')).toBeInTheDocument();
+    expect(screen.getByText('Brayden Yarnall')).toBeInTheDocument();
   });
 
   it('switching bracket re-projects the worst case (White #15 → 4 games)', () => {
@@ -29,23 +38,19 @@ describe('App — end-to-end wiring', () => {
   it('marking the opening game Won prunes a game from the worst case', () => {
     render(<App />);
     expect(screen.getByText(/6 games left to win it all/i)).toBeInTheDocument();
-    // The current bracket game (GM32) is the only one with a live Won/Lost control
-    // among the earliest; click the first "Won".
     fireEvent.click(screen.getAllByRole('button', { name: 'Won' })[0]);
-    // Winning GM32 drops the worst case from 6 to 5 remaining (GM34 now current).
     expect(screen.getByText(/5 games left to win it all/i)).toBeInTheDocument();
   });
 
-  it('adding a pitcher flows through to the availability table', () => {
+  it('adding a pitcher on the Plan tab flows to the Availability table', () => {
     render(<App />);
-    // Open the add-pitcher sheet for the first game (Day 1 pool).
+    // Add 25 pitches to the first game (Day 1 pool) on the Plan tab.
     fireEvent.click(screen.getAllByText('+ Add pitcher')[0]);
     const dialog = screen.getByRole('dialog');
-    // Pick an available pitcher.
     fireEvent.click(within(dialog).getByText('Alek Biletnikoff'));
-    // Confirm 25 pitches.
     fireEvent.click(within(dialog).getByRole('button', { name: /Add 25 pitches/i }));
-    // The roster table should now show the pitched count somewhere.
+    // Verify it on the Availability tab.
+    fireEvent.click(screen.getByRole('tab', { name: 'Availability' }));
     expect(screen.getAllByText('25').length).toBeGreaterThan(0);
     expect(screen.getAllByText('pitches').length).toBeGreaterThan(0);
   });

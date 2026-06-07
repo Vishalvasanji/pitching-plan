@@ -1,15 +1,20 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useStore } from './state/store';
 import { TOURNAMENT_DATES, TOURNAMENT_NAME } from './data/tournament';
+import { ASSUMED_SEED, BRACKET_LABELS } from './data/brackets';
 import { BracketSelector } from './components/BracketSelector';
 import { WorstCaseSummary } from './components/WorstCaseSummary';
 import { RosterTable } from './components/RosterTable';
-import { DayBoard } from './components/DayBoard';
+import { GamesBoard } from './components/GamesBoard';
 import { ThemeToggle } from './components/ThemeToggle';
+
+type Tab = 'plan' | 'availability';
 
 export function App() {
   const theme = useStore((s) => s.theme);
   const resetPlan = useStore((s) => s.resetPlan);
+  const bracket = useStore((s) => s.selectedBracket);
+  const [tab, setTab] = useState<Tab>('plan');
 
   useEffect(() => {
     const root = document.documentElement;
@@ -29,39 +34,71 @@ export function App() {
         <ThemeToggle />
       </header>
 
-      <BracketSelector />
-
-      <div className="section">
-        <WorstCaseSummary />
-      </div>
-
-      <div className="section">
-        <h2 className="section__title">Pitcher availability</h2>
-        <RosterTable />
-        <div className="legend">
-          <span>
-            <i style={{ background: 'var(--green)' }} />
-            Available
-          </span>
-          <span>
-            <i style={{ background: 'var(--fill-strong)' }} />
-            Pitched (count)
-          </span>
-          <span>
-            <i style={{ background: 'var(--orange)' }} />
-            Resting
-          </span>
-          <span>
-            <i style={{ background: 'var(--red)' }} />
-            Rule violation
-          </span>
+      <div className="tabs">
+        <div className="segmented" role="tablist" aria-label="View">
+          <button
+            role="tab"
+            aria-selected={tab === 'plan'}
+            className={`segmented__option ${tab === 'plan' ? 'segmented__option--active' : ''}`}
+            onClick={() => setTab('plan')}
+          >
+            Plan
+          </button>
+          <button
+            role="tab"
+            aria-selected={tab === 'availability'}
+            className={`segmented__option ${tab === 'availability' ? 'segmented__option--active' : ''}`}
+            onClick={() => setTab('availability')}
+          >
+            Availability
+          </button>
         </div>
       </div>
 
-      <div className="section">
-        <h2 className="section__title">Games &amp; pitching plan</h2>
-        <DayBoard />
-      </div>
+      {tab === 'plan' ? (
+        <>
+          <section className="section">
+            <h2 className="section__title">Pool Play</h2>
+            <GamesBoard days={[1, 2]} />
+          </section>
+
+          <section className="section">
+            <h2 className="section__title">Bracket Play</h2>
+            <div className="stack">
+              <BracketSelector />
+              <WorstCaseSummary />
+              <GamesBoard days={[3, 4]} />
+            </div>
+          </section>
+        </>
+      ) : (
+        <section className="section">
+          <h2 className="section__title">Pitcher availability</h2>
+          <p className="caption" style={{ margin: '0 4px 12px' }}>
+            Reflecting the <strong>{BRACKET_LABELS[bracket]} bracket</strong> · assuming the #
+            {ASSUMED_SEED[bracket]} seed. Pool days are fixed; bracket days follow your marked path.
+          </p>
+          <RosterTable />
+          <div className="legend">
+            <span>
+              <i style={{ background: 'var(--green)' }} />
+              Available
+            </span>
+            <span>
+              <i style={{ background: 'var(--fill-strong)' }} />
+              Pitched (count)
+            </span>
+            <span>
+              <i style={{ background: 'var(--orange)' }} />
+              Resting
+            </span>
+            <span>
+              <i style={{ background: 'var(--red)' }} />
+              Rule violation
+            </span>
+          </div>
+        </section>
+      )}
 
       <footer style={{ marginTop: 32, textAlign: 'center' }}>
         <button

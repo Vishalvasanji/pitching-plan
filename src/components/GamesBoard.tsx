@@ -5,23 +5,22 @@ import { GameCard } from './GameCard';
 import { AddPitcherSheet } from './AddPitcherSheet';
 import type { DayIndex } from '../types';
 
-export function DayBoard() {
+/** Renders the game cards for a subset of days (e.g. pool [1,2] or bracket [3,4]). */
+export function GamesBoard({ days }: { days: DayIndex[] }) {
   const { gamesByDay } = useDerivedPlan();
   const [addFor, setAddFor] = useState<{ gameId: string; day: DayIndex } | null>(null);
+  const shown = DAYS.filter((d) => days.includes(d.index));
 
   return (
     <>
       <div className="board">
-        {DAYS.map((day) => (
+        {shown.map((day) => (
           <div className="day" key={day.index}>
             <div className="day__header">
-              <div>
-                <span className="day__title">{day.label}</span>{' '}
-                <span className="day__date">
-                  {day.weekday} {day.date}
-                </span>
-              </div>
-              <span className="day__phase">{day.phase}</span>
+              <span className="day__title">{day.label}</span>
+              <span className="day__date">
+                {day.weekday} {day.date}
+              </span>
             </div>
             <div className="day__games">
               {gamesByDay[day.index].length === 0 ? (

@@ -54,17 +54,37 @@ button {
   font-weight: 500;
 }
 
+/* sticky top-level tab switcher (Plan / Availability) */
+.tabs {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--bg);
+  padding: 10px 0;
+  margin-bottom: var(--sp-2);
+  border-bottom: 1px solid var(--separator);
+}
+
 .section {
-  margin-top: var(--sp-5);
+  margin-top: 30px;
 }
 
 .section__title {
   font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.03em;
+  font-weight: 700;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--secondary-label);
-  margin: 0 0 var(--sp-3) var(--sp-1);
+  margin: 0 0 var(--sp-3);
+  padding-bottom: var(--sp-2);
+  border-bottom: 1px solid var(--separator);
+}
+
+/* vertical flow with even spacing (bracket selector → banner → games) */
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
 }
 
 /* ---------- cards ---------- */
@@ -256,7 +276,7 @@ button {
 .day__header {
   display: flex;
   align-items: baseline;
-  justify-content: space-between;
+  gap: var(--sp-2);
   padding: var(--sp-3) var(--sp-4);
   border-bottom: 1px solid var(--separator);
 }
@@ -268,13 +288,6 @@ button {
   font-size: 13px;
   color: var(--secondary-label);
   font-weight: 500;
-}
-.day__phase {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--secondary-label);
 }
 .day__games {
   display: flex;
