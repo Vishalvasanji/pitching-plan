@@ -62,10 +62,20 @@ export interface DayStatus {
   gameIds: string[]; // games this player is assigned on this day
 }
 
-export interface PlanState {
-  version: number;
+export interface PlanData {
   selectedBracket: BracketId;
   results: Record<string, GameResult>; // gameId -> W/L for the team's path
   assignments: Assignment[];
+}
+
+export interface UserProfile {
+  name: string;
+  plan: PlanData;
+}
+
+export interface RootState {
+  version: number;
+  currentUser: string | null; // active profile slug
+  users: Record<string, UserProfile>;
   theme: Theme;
 }

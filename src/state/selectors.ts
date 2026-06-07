@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useStore } from './store';
+import { useStore, activePlan } from './store';
 import { ROSTER } from '../data/roster';
 import { POOL_GAMES } from '../data/schedule';
 import { getGame } from '../data/games';
@@ -28,10 +28,14 @@ export interface DerivedPlan {
 
 const DAY_INDEXES: DayIndex[] = [1, 2, 3, 4];
 
+/** The active profile's plan data (stable reference; safe before a user is chosen). */
+export function useActivePlan() {
+  return useStore(activePlan);
+}
+
 export function useDerivedPlan(): DerivedPlan {
-  const selectedBracket = useStore((s) => s.selectedBracket);
-  const results = useStore((s) => s.results);
-  const assignments = useStore((s) => s.assignments);
+  const plan = useActivePlan();
+  const { selectedBracket, results, assignments } = plan;
 
   return useMemo(() => {
     const trace = tracePath(selectedBracket, results);
@@ -82,11 +86,11 @@ export function useDerivedPlan(): DerivedPlan {
       outcome: trace.outcome,
       trace,
     };
-  }, [selectedBracket, results, assignments]);
+  }, [plan, selectedBracket, results, assignments]);
 }
 
 /** Assignments for a single game (memo-friendly thin selector). */
 export function useGameAssignments(gameId: string): Assignment[] {
-  const assignments = useStore((s) => s.assignments);
+  const { assignments } = useActivePlan();
   return useMemo(() => assignments.filter((a) => a.gameId === gameId), [assignments, gameId]);
 }

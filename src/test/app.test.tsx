@@ -5,10 +5,20 @@ import { useStore } from '../state/store';
 
 beforeEach(() => {
   localStorage.clear();
-  useStore.getState().resetPlan();
+  useStore.setState({ currentUser: null, users: {}, theme: 'system' });
+  useStore.getState().setUser('Tester');
 });
 
 describe('App — end-to-end wiring', () => {
+  it('shows the name gate until a name is entered', () => {
+    useStore.setState({ currentUser: null, users: {} });
+    render(<App />);
+    expect(screen.getByText(/Who's planning/i)).toBeInTheDocument();
+    fireEvent.change(screen.getByPlaceholderText(/your name/i), { target: { value: 'Coach' } });
+    fireEvent.click(screen.getByRole('button', { name: /^Start$/i }));
+    expect(screen.getByText('Pool Play')).toBeInTheDocument();
+  });
+
   it('opens on the Plan tab with the Red worst-case headline (6 games)', () => {
     render(<App />);
     expect(screen.getByText('Pitching Plan')).toBeInTheDocument();

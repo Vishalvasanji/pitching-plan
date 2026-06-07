@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useStore } from './state/store';
+import { useActivePlan } from './state/selectors';
 import { TOURNAMENT_DATES, TOURNAMENT_NAME } from './data/tournament';
 import { ASSUMED_SEED, BRACKET_LABELS } from './data/brackets';
 import { BracketSelector } from './components/BracketSelector';
@@ -7,13 +8,17 @@ import { WorstCaseSummary } from './components/WorstCaseSummary';
 import { RosterTable } from './components/RosterTable';
 import { GamesBoard } from './components/GamesBoard';
 import { ThemeToggle } from './components/ThemeToggle';
+import { NameGate } from './components/NameGate';
 
 type Tab = 'plan' | 'availability';
 
 export function App() {
   const theme = useStore((s) => s.theme);
+  const currentUser = useStore((s) => s.currentUser);
+  const users = useStore((s) => s.users);
+  const signOut = useStore((s) => s.signOut);
   const resetPlan = useStore((s) => s.resetPlan);
-  const bracket = useStore((s) => s.selectedBracket);
+  const bracket = useActivePlan().selectedBracket;
   const [tab, setTab] = useState<Tab>('plan');
 
   useEffect(() => {
@@ -21,6 +26,14 @@ export function App() {
     if (theme === 'system') root.removeAttribute('data-theme');
     else root.setAttribute('data-theme', theme);
   }, [theme]);
+
+  if (!currentUser) {
+    return (
+      <div className="container">
+        <NameGate />
+      </div>
+    );
+  }
 
   return (
     <div className="container">
@@ -31,7 +44,13 @@ export function App() {
             {TOURNAMENT_NAME} · {TOURNAMENT_DATES}
           </p>
         </div>
-        <ThemeToggle />
+        <div className="app__actions">
+          <button className="userchip" onClick={signOut} title="Switch user">
+            <span className="userchip__name">👤 {users[currentUser]?.name}</span>
+            <span className="userchip__switch">Switch</span>
+          </button>
+          <ThemeToggle />
+        </div>
       </header>
 
       <div className="tabs">
@@ -97,7 +116,7 @@ export function App() {
         <button
           className="btn btn--plain"
           onClick={() => {
-            if (window.confirm('Reset the whole plan? This clears all results and pitch assignments.')) {
+            if (window.confirm("Reset this plan? This clears all results and pitch assignments for the current name.")) {
               resetPlan();
             }
           }}

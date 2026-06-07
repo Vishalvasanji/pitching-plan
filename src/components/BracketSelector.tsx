@@ -1,11 +1,12 @@
 import { useStore } from '../state/store';
+import { useActivePlan } from '../state/selectors';
 import { ASSUMED_SEED, BRACKET_LABELS, BRACKET_SEED_RANGE } from '../data/brackets';
 import type { BracketId } from '../types';
 
 const ORDER: BracketId[] = ['red', 'blue', 'white'];
 
 export function BracketSelector() {
-  const bracket = useStore((s) => s.selectedBracket);
+  const bracket = useActivePlan().selectedBracket;
   const setBracket = useStore((s) => s.setBracket);
 
   return (

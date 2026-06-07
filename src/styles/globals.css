@@ -904,3 +904,95 @@ button {
   color: var(--secondary-label);
   padding: var(--sp-3) var(--sp-4);
 }
+
+/* ---------- user chip + name gate ---------- */
+.app__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.userchip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  background: var(--fill);
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 6px 10px;
+  color: var(--label);
+  font-size: 13px;
+  font-weight: 600;
+}
+.userchip:active {
+  transform: scale(0.97);
+}
+.userchip__switch {
+  color: var(--blue);
+  font-size: 12px;
+}
+
+.gate {
+  min-height: 72vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-5) 0;
+}
+.gate__card {
+  width: 100%;
+  max-width: 420px;
+  padding: var(--sp-6) var(--sp-5);
+  text-align: center;
+}
+.gate__title {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+.gate__sub {
+  color: var(--secondary-label);
+  font-size: 13px;
+  margin: 4px 0 var(--sp-5);
+}
+.gate__prompt {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 var(--sp-3);
+}
+.gate__form {
+  display: flex;
+  gap: var(--sp-2);
+}
+.gate__input {
+  flex: 1;
+  font-size: 16px;
+  padding: 11px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--separator);
+  background: var(--card-bg-2);
+  color: var(--label);
+}
+.gate__input:focus {
+  outline: 2px solid var(--blue);
+  border-color: transparent;
+}
+.gate__resume {
+  font-size: 12px;
+  color: var(--secondary-label);
+  margin: var(--sp-5) 0 var(--sp-2);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+}
+.gate__profiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  justify-content: center;
+}
+.gate__note {
+  font-size: 12px;
+  color: var(--tertiary-label);
+  margin: var(--sp-5) 0 0;
+}

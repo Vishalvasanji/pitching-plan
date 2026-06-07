@@ -3,7 +3,7 @@ import { Sheet } from './ui/Sheet';
 import { Stepper } from './ui/Stepper';
 import { ROSTER } from '../data/roster';
 import { useStore } from '../state/store';
-import { useDerivedPlan } from '../state/selectors';
+import { useDerivedPlan, useActivePlan } from '../state/selectors';
 import { backOnLabel } from '../lib/engine/format';
 import type { DayIndex } from '../types';
 
@@ -18,7 +18,7 @@ interface Props {
 
 export function AddPitcherSheet({ open, gameId, day, onClose }: Props) {
   const { availability } = useDerivedPlan();
-  const assignments = useStore((s) => s.assignments);
+  const assignments = useActivePlan().assignments;
   const add = useStore((s) => s.addAssignment);
 
   const [selected, setSelected] = useState<string | null>(null);
