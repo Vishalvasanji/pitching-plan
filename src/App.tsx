@@ -14,12 +14,11 @@ type Tab = 'plan' | 'availability';
 
 export function App() {
   const theme = useStore((s) => s.theme);
-  const currentUser = useStore((s) => s.currentUser);
-  const users = useStore((s) => s.users);
-  const signOut = useStore((s) => s.signOut);
+  const userName = useStore((s) => s.userName);
   const resetPlan = useStore((s) => s.resetPlan);
   const bracket = useActivePlan().selectedBracket;
   const [tab, setTab] = useState<Tab>('plan');
+  const [editingName, setEditingName] = useState(false);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -27,13 +26,15 @@ export function App() {
     else root.setAttribute('data-theme', theme);
   }, [theme]);
 
-  if (!currentUser) {
+  if (!userName || editingName) {
     return (
       <div className="container">
-        <NameGate />
+        <NameGate initialName={userName ?? ''} onSaved={() => setEditingName(false)} />
       </div>
     );
   }
+
+  const initial = userName.trim().charAt(0).toUpperCase();
 
   return (
     <div className="container">
@@ -45,11 +46,15 @@ export function App() {
           </p>
         </div>
         <div className="app__actions">
-          <button className="userchip" onClick={signOut} title="Switch user">
-            <span className="userchip__name">👤 {users[currentUser]?.name}</span>
-            <span className="userchip__switch">Switch</span>
-          </button>
           <ThemeToggle />
+          <button
+            className="avatar"
+            onClick={() => setEditingName(true)}
+            title={`${userName} — tap to change name`}
+            aria-label={`${userName} — change name`}
+          >
+            {initial}
+          </button>
         </div>
       </header>
 
@@ -116,7 +121,7 @@ export function App() {
         <button
           className="btn btn--plain"
           onClick={() => {
-            if (window.confirm("Reset this plan? This clears all results and pitch assignments for the current name.")) {
+            if (window.confirm('Reset this plan? This clears all results and pitch assignments.')) {
               resetPlan();
             }
           }}

@@ -4,7 +4,7 @@ import type { BracketId, GameResult, PlanData, RootState, Theme } from '../types
 import { tracePath } from '../lib/engine/bracket';
 
 const STORAGE_KEY = 'pitching-plan';
-const VERSION = 2;
+const VERSION = 3;
 
 export const INITIAL_PLAN: PlanData = {
   selectedBracket: 'red',
@@ -14,7 +14,6 @@ export const INITIAL_PLAN: PlanData = {
 
 interface Store extends RootState {
   setUser(name: string): void;
-  signOut(): void;
   setBracket(b: BracketId): void;
   setResult(gameId: string, result: GameResult | null): void;
   addAssignment(gameId: string, playerId: string, pitches: number): void;
@@ -22,16 +21,6 @@ interface Store extends RootState {
   removeAssignment(id: string): void;
   setTheme(t: Theme): void;
   resetPlan(): void;
-}
-
-function slugify(name: string): string {
-  return (
-    name
-      .trim()
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '') || 'coach'
-  );
 }
 
 function uid(): string {
@@ -52,101 +41,87 @@ function prunedResults(
 
 const initialRoot: RootState = {
   version: VERSION,
-  currentUser: null,
-  users: {},
+  userName: null,
+  plan: INITIAL_PLAN,
   theme: 'system',
 };
 
-/** Immutably update the active profile's plan. No-op if no profile is active. */
-function patchActivePlan(s: Store, fn: (p: PlanData) => PlanData): Partial<Store> {
-  const key = s.currentUser;
-  const user = key ? s.users[key] : undefined;
-  if (!key || !user) return {};
-  return { users: { ...s.users, [key]: { ...user, plan: fn(user.plan) } } };
-}
-
+/** The plan for the current device (stable reference until it changes). */
 export function activePlan(s: Store): PlanData {
-  return (s.currentUser && s.users[s.currentUser]?.plan) || INITIAL_PLAN;
+  return s.plan;
 }
 
 export const useStore = create<Store>()(
   persist(
     (set) => ({
       ...initialRoot,
-      setUser: (name) =>
-        set((s) => {
-          const slug = slugify(name);
-          const users = s.users[slug]
-            ? s.users
-            : { ...s.users, [slug]: { name: name.trim(), plan: INITIAL_PLAN } };
-          return { users, currentUser: slug };
-        }),
-      signOut: () => set(() => ({ currentUser: null })),
+      setUser: (name) => set(() => ({ userName: name.trim() || null })),
       setBracket: (b) =>
-        set((s) => patchActivePlan(s, (p) => ({ ...p, selectedBracket: b, results: {} }))),
+        set((s) => ({ plan: { ...s.plan, selectedBracket: b, results: {} } })),
       setResult: (gameId, result) =>
-        set((s) =>
-          patchActivePlan(s, (p) => {
-            const results = { ...p.results };
-            if (result === null) delete results[gameId];
-            else results[gameId] = result;
-            return { ...p, results: prunedResults(p.selectedBracket, results) };
-          }),
-        ),
+        set((s) => {
+          const results = { ...s.plan.results };
+          if (result === null) delete results[gameId];
+          else results[gameId] = result;
+          return { plan: { ...s.plan, results: prunedResults(s.plan.selectedBracket, results) } };
+        }),
       addAssignment: (gameId, playerId, pitches) =>
-        set((s) =>
-          patchActivePlan(s, (p) => ({
-            ...p,
-            assignments: [...p.assignments, { id: uid(), gameId, playerId, pitches }],
-          })),
-        ),
+        set((s) => ({
+          plan: { ...s.plan, assignments: [...s.plan.assignments, { id: uid(), gameId, playerId, pitches }] },
+        })),
       updateAssignmentPitches: (id, pitches) =>
-        set((s) =>
-          patchActivePlan(s, (p) => ({
-            ...p,
-            assignments: p.assignments.map((a) => (a.id === id ? { ...a, pitches } : a)),
-          })),
-        ),
+        set((s) => ({
+          plan: { ...s.plan, assignments: s.plan.assignments.map((a) => (a.id === id ? { ...a, pitches } : a)) },
+        })),
       removeAssignment: (id) =>
-        set((s) =>
-          patchActivePlan(s, (p) => ({
-            ...p,
-            assignments: p.assignments.filter((a) => a.id !== id),
-          })),
-        ),
+        set((s) => ({
+          plan: { ...s.plan, assignments: s.plan.assignments.filter((a) => a.id !== id) },
+        })),
       setTheme: (t) => set(() => ({ theme: t })),
-      resetPlan: () => set((s) => patchActivePlan(s, () => ({ ...INITIAL_PLAN }))),
+      resetPlan: () => set(() => ({ plan: INITIAL_PLAN })),
     }),
     {
       name: STORAGE_KEY,
       version: VERSION,
-      // v1 stored a single flat plan; wrap it into a default profile so data isn't lost.
+      // Preserve data from older shapes so no one loses their plan.
       migrate: (persisted, fromVersion) => {
         const old = persisted as Record<string, unknown> | undefined;
-        if (fromVersion < 2 && old && 'selectedBracket' in old) {
-          const slug = 'my-plan';
+        if (!old) return persisted as RootState;
+
+        // v2: profiles map -> carry the active profile into the flat shape.
+        if (fromVersion === 2 && 'users' in old) {
+          const users = old.users as Record<string, { name: string; plan: PlanData }> | undefined;
+          const cu = (old.currentUser as string | null) ?? null;
+          const prof = cu && users ? users[cu] : undefined;
+          const name = prof?.name && prof.name !== 'My Plan' ? prof.name : null;
           return {
             version: VERSION,
-            currentUser: slug,
-            users: {
-              [slug]: {
-                name: 'My Plan',
-                plan: {
-                  selectedBracket: (old.selectedBracket as BracketId) ?? 'red',
-                  results: (old.results as Record<string, GameResult>) ?? {},
-                  assignments: (old.assignments as PlanData['assignments']) ?? [],
-                },
-              },
+            userName: name,
+            plan: prof?.plan ?? INITIAL_PLAN,
+            theme: (old.theme as Theme) ?? 'system',
+          } satisfies RootState;
+        }
+
+        // v1: flat single plan (no name) -> keep the plan, ask for a name.
+        if (fromVersion < 2 && 'selectedBracket' in old) {
+          return {
+            version: VERSION,
+            userName: null,
+            plan: {
+              selectedBracket: (old.selectedBracket as BracketId) ?? 'red',
+              results: (old.results as Record<string, GameResult>) ?? {},
+              assignments: (old.assignments as PlanData['assignments']) ?? [],
             },
             theme: (old.theme as Theme) ?? 'system',
           } satisfies RootState;
         }
+
         return persisted as RootState;
       },
       partialize: (s) => ({
         version: s.version,
-        currentUser: s.currentUser,
-        users: s.users,
+        userName: s.userName,
+        plan: s.plan,
         theme: s.theme,
       }),
     },

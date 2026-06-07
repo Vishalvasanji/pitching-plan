@@ -68,14 +68,9 @@ export interface PlanData {
   assignments: Assignment[];
 }
 
-export interface UserProfile {
-  name: string;
-  plan: PlanData;
-}
-
 export interface RootState {
   version: number;
-  currentUser: string | null; // active profile slug
-  users: Record<string, UserProfile>;
+  userName: string | null;
+  plan: PlanData;
   theme: Theme;
 }
