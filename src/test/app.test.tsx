@@ -14,13 +14,16 @@ beforeEach(() => {
 });
 
 describe('App — end-to-end wiring', () => {
-  it('shows the name gate until a first name is entered', () => {
+  it('shows the name gate first when no name, saves on enter, and persists it', () => {
     useStore.setState({ userName: null });
     render(<App />);
     expect(screen.getByText(/first name/i)).toBeInTheDocument();
-    fireEvent.change(screen.getByPlaceholderText(/first name/i), { target: { value: 'Coach' } });
-    fireEvent.click(screen.getByRole('button', { name: /^Save$/i }));
+    const input = screen.getByPlaceholderText(/first name/i);
+    fireEvent.change(input, { target: { value: 'Coach' } });
+    fireEvent.submit(input.closest('form') as HTMLFormElement);
     expect(screen.getByText('Pool Play')).toBeInTheDocument();
+    expect(useStore.getState().userName).toBe('Coach');
+    expect(localStorage.getItem('pitching-plan') ?? '').toContain('Coach');
   });
 
   it('opens on the Plan tab with the Red worst-case headline (6 games)', () => {

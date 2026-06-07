@@ -32,12 +32,11 @@ export function NameGate({
             value={name}
             onChange={(e) => setName(e.target.value)}
             autoFocus
+            enterKeyHint="done"
             aria-label="First name"
           />
-          <button type="submit" className="btn btn--primary" disabled={!name.trim()}>
-            Save
-          </button>
         </form>
+        <p className="gate__hint">Press enter to save</p>
       </div>
     </div>
   );
