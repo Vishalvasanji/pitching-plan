@@ -17,5 +17,3 @@ export const ROSTER: Player[] = [
   { id: 'p25', number: 25, firstName: 'Jaylen', lastName: 'Vasanji', position: '2B' },
   { id: 'p1', number: 1, firstName: 'Brayden', lastName: 'Yarnall', position: '1B' },
 ];
-
-export const PLAYER_BY_ID: Map<string, Player> = new Map(ROSTER.map((p) => [p.id, p]));

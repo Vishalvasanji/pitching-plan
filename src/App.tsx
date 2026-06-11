@@ -9,9 +9,8 @@ import { RosterTable } from './components/RosterTable';
 import { GamesBoard } from './components/GamesBoard';
 import { ThemeToggle } from './components/ThemeToggle';
 import { NameGate } from './components/NameGate';
-import { Scenarios } from './components/Scenarios';
 
-type Tab = 'plan' | 'availability' | 'scenarios';
+type Tab = 'plan' | 'availability';
 
 export function App() {
   const theme = useStore((s) => s.theme);
@@ -77,18 +76,10 @@ export function App() {
           >
             Availability
           </button>
-          <button
-            role="tab"
-            aria-selected={tab === 'scenarios'}
-            className={`segmented__option ${tab === 'scenarios' ? 'segmented__option--active' : ''}`}
-            onClick={() => setTab('scenarios')}
-          >
-            Scenarios
-          </button>
         </div>
       </div>
 
-      {tab === 'plan' && (
+      {tab === 'plan' ? (
         <>
           <section className="section">
             <h2 className="section__title">Pool Play</h2>
@@ -104,9 +95,7 @@ export function App() {
             </div>
           </section>
         </>
-      )}
-
-      {tab === 'availability' && (
+      ) : (
         <section className="section">
           <h2 className="section__title">Pitcher availability</h2>
           <p className="caption" style={{ margin: '0 4px 12px' }}>
@@ -127,8 +116,6 @@ export function App() {
           </div>
         </section>
       )}
-
-      {tab === 'scenarios' && <Scenarios />}
 
       <footer style={{ marginTop: 32, textAlign: 'center' }}>
         <button

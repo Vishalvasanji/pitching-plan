@@ -1,10 +1,10 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { ArmStatus, BracketId, GameResult, PlanData, RootState, SlotArm, Theme } from '../types';
+import type { BracketId, GameResult, PlanData, RootState, Theme } from '../types';
 import { tracePath } from '../lib/engine/bracket';
 
 const STORAGE_KEY = 'pitching-plan';
-const VERSION = 4;
+const VERSION = 3;
 
 export const INITIAL_PLAN: PlanData = {
   selectedBracket: 'red',
@@ -21,9 +21,6 @@ interface Store extends RootState {
   removeAssignment(id: string): void;
   setTheme(t: Theme): void;
   resetPlan(): void;
-  setArmStatus(playerId: string, status: ArmStatus): void;
-  setScenarioArms(scenarioId: string, gameId: string, arms: SlotArm[]): void;
-  resetScenarios(): void;
 }
 
 function uid(): string {
@@ -47,8 +44,6 @@ const initialRoot: RootState = {
   userName: null,
   plan: INITIAL_PLAN,
   theme: 'system',
-  armStatus: {},
-  scenarioArms: {},
 };
 
 /** The plan for the current device (stable reference until it changes). */
@@ -84,16 +79,6 @@ export const useStore = create<Store>()(
         })),
       setTheme: (t) => set(() => ({ theme: t })),
       resetPlan: () => set(() => ({ plan: INITIAL_PLAN })),
-      setArmStatus: (playerId, status) =>
-        set((s) => ({ armStatus: { ...s.armStatus, [playerId]: status } })),
-      setScenarioArms: (scenarioId, gameId, arms) =>
-        set((s) => {
-          const forScenario = { ...(s.scenarioArms[scenarioId] ?? {}) };
-          if (arms.length === 0) delete forScenario[gameId];
-          else forScenario[gameId] = arms;
-          return { scenarioArms: { ...s.scenarioArms, [scenarioId]: forScenario } };
-        }),
-      resetScenarios: () => set(() => ({ armStatus: {}, scenarioArms: {} })),
     }),
     {
       name: STORAGE_KEY,
@@ -114,8 +99,6 @@ export const useStore = create<Store>()(
             userName: name,
             plan: prof?.plan ?? INITIAL_PLAN,
             theme: (old.theme as Theme) ?? 'system',
-            armStatus: {},
-            scenarioArms: {},
           } satisfies RootState;
         }
 
@@ -130,26 +113,16 @@ export const useStore = create<Store>()(
               assignments: (old.assignments as PlanData['assignments']) ?? [],
             },
             theme: (old.theme as Theme) ?? 'system',
-            armStatus: {},
-            scenarioArms: {},
           } satisfies RootState;
         }
 
-        // v3 -> v4: add the scenarios fields, keep everything else intact.
-        return {
-          ...(old as unknown as RootState),
-          version: VERSION,
-          armStatus: (old.armStatus as RootState['armStatus']) ?? {},
-          scenarioArms: (old.scenarioArms as RootState['scenarioArms']) ?? {},
-        };
+        return persisted as RootState;
       },
       partialize: (s) => ({
         version: s.version,
         userName: s.userName,
         plan: s.plan,
         theme: s.theme,
-        armStatus: s.armStatus,
-        scenarioArms: s.scenarioArms,
       }),
     },
   ),
