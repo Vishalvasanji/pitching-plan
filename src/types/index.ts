@@ -5,6 +5,14 @@ export type BracketId = 'red' | 'blue' | 'white';
 export type GameResult = 'W' | 'L';
 export type GamePhase = 'pool' | 'bracket';
 export type Theme = 'light' | 'dark' | 'system';
+export type ArmStatus = 'available' | 'emergency' | 'out';
+export type PitchRole = 'ace' | 'starter' | 'eater' | 'emergency' | 'no-pitch';
+
+/** One pitcher's planned workload within a single game (supports split outings). */
+export interface SlotArm {
+  playerId: string;
+  pitches: number;
+}
 
 export interface Player {
   id: string; // stable id, e.g. "p25"
@@ -73,4 +81,7 @@ export interface RootState {
   userName: string | null;
   plan: PlanData;
   theme: Theme;
+  // Scenarios tab state (persisted).
+  armStatus: Record<string, ArmStatus>; // playerId -> availability override
+  scenarioArms: Record<string, Record<string, SlotArm[]>>; // scenarioId -> gameId -> arms
 }
