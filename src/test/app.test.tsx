@@ -1,0 +1,90 @@
+import { describe, it, expect, beforeEach } from 'vitest';
+import { fireEvent, render, screen, within } from '@testing-library/react';
+import { App } from '../App';
+import { useStore } from '../state/store';
+
+beforeEach(() => {
+  localStorage.clear();
+  useStore.setState({
+    userName: null,
+    plan: { selectedBracket: 'red', results: {}, assignments: [] },
+    theme: 'system',
+  });
+  useStore.getState().setUser('Tester');
+});
+
+describe('App — end-to-end wiring', () => {
+  it('shows the name gate first when no name, saves on enter, and persists it', () => {
+    useStore.setState({ userName: null });
+    render(<App />);
+    expect(screen.getByText(/first name/i)).toBeInTheDocument();
+    const input = screen.getByPlaceholderText(/first name/i);
+    fireEvent.change(input, { target: { value: 'Coach' } });
+    fireEvent.submit(input.closest('form') as HTMLFormElement);
+    expect(screen.getByText('Pool Play')).toBeInTheDocument();
+    expect(useStore.getState().userName).toBe('Coach');
+    expect(localStorage.getItem('pitching-plan') ?? '').toContain('Coach');
+  });
+
+  it('opens on the Plan tab with the Red worst-case headline (6 games)', () => {
+    render(<App />);
+    expect(screen.getByText('Pitching Plan')).toBeInTheDocument();
+    expect(screen.getByText('Pool Play')).toBeInTheDocument();
+    expect(screen.getByText('Bracket Play')).toBeInTheDocument();
+    // Red #6 worst case = 6 total games to win it all.
+    expect(screen.getByText(/6 games left to win it all/i)).toBeInTheDocument();
+    expect(screen.getByText('#6 seed')).toBeInTheDocument();
+  });
+
+  it('labels the championship game on the bracket path', () => {
+    render(<App />);
+    // The Red worst-case path ends at GM40, the championship game.
+    expect(screen.getByText(/Championship/i)).toBeInTheDocument();
+  });
+
+  it('shows the roster on the Availability tab', () => {
+    render(<App />);
+    // Roster lives on the Availability tab, not the default Plan tab.
+    expect(screen.queryByText('Alek Biletnikoff')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('tab', { name: 'Availability' }));
+    expect(screen.getByText('Alek Biletnikoff')).toBeInTheDocument();
+    expect(screen.getByText('Brayden Yarnall')).toBeInTheDocument();
+  });
+
+  it('switching bracket re-projects the worst case (White #15 → 4 games)', () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole('tab', { name: /White/i }));
+    expect(screen.getByText('#15 seed')).toBeInTheDocument();
+    expect(screen.getByText(/4 games left to win it all/i)).toBeInTheDocument();
+  });
+
+  it('marking the opening game Won prunes a game from the worst case', () => {
+    render(<App />);
+    expect(screen.getByText(/6 games left to win it all/i)).toBeInTheDocument();
+    fireEvent.click(screen.getAllByRole('button', { name: 'Won' })[0]);
+    expect(screen.getByText(/5 games left to win it all/i)).toBeInTheDocument();
+  });
+
+  it('lets you enter an exact pitch count', () => {
+    render(<App />);
+    fireEvent.click(screen.getAllByText('+ Add pitcher')[0]);
+    const dialog = screen.getByRole('dialog');
+    fireEvent.click(within(dialog).getByText('Alek Biletnikoff'));
+    fireEvent.change(within(dialog).getByLabelText('Pitches'), { target: { value: '47' } });
+    fireEvent.click(within(dialog).getByRole('button', { name: /Add 47 pitches/i }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Availability' }));
+    expect(screen.getByTitle(/47 pitches/i)).toBeInTheDocument();
+  });
+
+  it('adding a pitcher on the Plan tab flows to the Availability table', () => {
+    render(<App />);
+    // Add 25 pitches to the first game (Day 1 pool) on the Plan tab.
+    fireEvent.click(screen.getAllByText('+ Add pitcher')[0]);
+    const dialog = screen.getByRole('dialog');
+    fireEvent.click(within(dialog).getByText('Alek Biletnikoff'));
+    fireEvent.click(within(dialog).getByRole('button', { name: /Add 25 pitches/i }));
+    // Verify it on the Availability tab (the day's dot carries the detail).
+    fireEvent.click(screen.getByRole('tab', { name: 'Availability' }));
+    expect(screen.getByTitle(/25 pitches/i)).toBeInTheDocument();
+  });
+});
