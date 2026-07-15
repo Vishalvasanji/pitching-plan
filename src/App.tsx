@@ -1,23 +1,29 @@
 import { useEffect, useState } from 'react';
 import { useStore } from './state/store';
-import { useActivePlan } from './state/selectors';
-import { TOURNAMENT_DATES, TOURNAMENT_NAME } from './data/tournament';
-import { ASSUMED_SEED, BRACKET_LABELS } from './data/brackets';
-import { BracketSelector } from './components/BracketSelector';
-import { WorstCaseSummary } from './components/WorstCaseSummary';
-import { RosterTable } from './components/RosterTable';
-import { GamesBoard } from './components/GamesBoard';
 import { ThemeToggle } from './components/ThemeToggle';
 import { NameGate } from './components/NameGate';
+import { GamesView } from './components/GamesView';
+import { AvailabilityTable } from './components/AvailabilityTable';
+import { RosterView } from './components/RosterView';
 
-type Tab = 'plan' | 'availability';
+// NOTE: The Gulf Coast World Series build (bracket tracing, seeds, worst-case,
+// pool/bracket boards) is preserved but dormant — its files are excluded from
+// the build in tsconfig.json / vite.config.ts and are not imported here.
+
+type Tab = 'games' | 'availability' | 'roster';
+
+const TABS: { id: Tab; label: string }[] = [
+  { id: 'games', label: 'Games' },
+  { id: 'availability', label: 'Availability' },
+  { id: 'roster', label: 'Roster' },
+];
 
 export function App() {
   const theme = useStore((s) => s.theme);
   const userName = useStore((s) => s.userName);
-  const resetPlan = useStore((s) => s.resetPlan);
-  const bracket = useActivePlan().selectedBracket;
-  const [tab, setTab] = useState<Tab>('plan');
+  const tournamentName = useStore((s) => s.tournamentName);
+  const resetTournament = useStore((s) => s.resetTournament);
+  const [tab, setTab] = useState<Tab>('games');
   const [editingName, setEditingName] = useState(false);
 
   useEffect(() => {
@@ -41,9 +47,7 @@ export function App() {
       <header className="app__header">
         <div>
           <h1 className="app__title">Pitching Plan</h1>
-          <p className="app__subtitle">
-            {TOURNAMENT_NAME} · {TOURNAMENT_DATES}
-          </p>
+          <p className="app__subtitle">{tournamentName || 'Weekend tournament'}</p>
         </div>
         <div className="app__actions">
           <ThemeToggle />
@@ -60,49 +64,30 @@ export function App() {
 
       <div className="tabs">
         <div className="segmented" role="tablist" aria-label="View">
-          <button
-            role="tab"
-            aria-selected={tab === 'plan'}
-            className={`segmented__option ${tab === 'plan' ? 'segmented__option--active' : ''}`}
-            onClick={() => setTab('plan')}
-          >
-            Plan
-          </button>
-          <button
-            role="tab"
-            aria-selected={tab === 'availability'}
-            className={`segmented__option ${tab === 'availability' ? 'segmented__option--active' : ''}`}
-            onClick={() => setTab('availability')}
-          >
-            Availability
-          </button>
+          {TABS.map((t) => (
+            <button
+              key={t.id}
+              role="tab"
+              aria-selected={tab === t.id}
+              className={`segmented__option ${tab === t.id ? 'segmented__option--active' : ''}`}
+              onClick={() => setTab(t.id)}
+            >
+              {t.label}
+            </button>
+          ))}
         </div>
       </div>
 
-      {tab === 'plan' ? (
-        <>
-          <section className="section">
-            <h2 className="section__title">Pool Play</h2>
-            <GamesBoard days={[1, 2]} />
-          </section>
+      {tab === 'games' && <GamesView />}
 
-          <section className="section">
-            <h2 className="section__title">Bracket Play</h2>
-            <div className="stack">
-              <BracketSelector />
-              <WorstCaseSummary />
-              <GamesBoard days={[3, 4]} />
-            </div>
-          </section>
-        </>
-      ) : (
+      {tab === 'availability' && (
         <section className="section">
           <h2 className="section__title">Pitcher availability</h2>
           <p className="caption" style={{ margin: '0 4px 12px' }}>
-            Reflecting the <strong>{BRACKET_LABELS[bracket]} bracket</strong> · assuming the #
-            {ASSUMED_SEED[bracket]} seed. Pool days are fixed; bracket days follow your marked path.
+            USSSA (13U+): <strong>7 IP/day</strong> · throw <strong>&gt;3 IP</strong> → rest next day ·
+            max <strong>8 IP</strong> over any 3 days · never <strong>4 days straight</strong>.
           </p>
-          <RosterTable />
+          <AvailabilityTable />
           <div className="legend">
             <span>
               <i style={{ background: 'var(--green)' }} />
@@ -110,23 +95,26 @@ export function App() {
             </span>
             <span>
               <i style={{ background: 'var(--red)' }} />
-              Not available (resting or pitching)
+              Resting
             </span>
-            <span>Number in a cell = pitches thrown that day</span>
+            <span>Number = innings pitched that day</span>
+            <span>Red outline = rule violation</span>
           </div>
         </section>
       )}
+
+      {tab === 'roster' && <RosterView />}
 
       <footer style={{ marginTop: 32, textAlign: 'center' }}>
         <button
           className="btn btn--plain"
           onClick={() => {
-            if (window.confirm('Reset this plan? This clears all results and pitch assignments.')) {
-              resetPlan();
+            if (window.confirm('Start a new tournament? This clears all games and pitching (roster stays).')) {
+              resetTournament();
             }
           }}
         >
-          Reset plan
+          New tournament
         </button>
       </footer>
     </div>

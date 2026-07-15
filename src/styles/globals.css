@@ -997,3 +997,134 @@ button {
   color: var(--tertiary-label);
   margin: var(--sp-5) 0 0;
 }
+
+/* ---------- form fields ---------- */
+.field {
+  display: block;
+  margin: var(--sp-3) 0;
+}
+.field__label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--secondary-label);
+  margin-bottom: 6px;
+}
+.field__input {
+  width: 100%;
+  font-family: inherit;
+  font-size: 16px;
+  padding: 11px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--separator);
+  background: var(--card-bg-2);
+  color: var(--label);
+}
+.field__input:focus {
+  outline: 2px solid var(--blue);
+  border-color: transparent;
+}
+.tourney-name {
+  margin-bottom: var(--sp-4);
+  font-weight: 700;
+  font-size: 17px;
+}
+
+/* ---------- games view ---------- */
+.games-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-3);
+  padding-bottom: var(--sp-2);
+  border-bottom: 1px solid var(--separator);
+}
+.dategroup {
+  margin-top: var(--sp-4);
+}
+.dategroup__head {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  margin: 0 4px var(--sp-2);
+}
+.gamecard__actions {
+  display: flex;
+  gap: 2px;
+}
+.btn--danger {
+  color: var(--red-ink);
+}
+
+/* ---------- innings stepper reading ---------- */
+.stepper__reading {
+  min-width: 54px;
+  font-variant-numeric: tabular-nums;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--label);
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 3px;
+}
+.stepper__reading small {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--secondary-label);
+}
+
+/* ---------- availability date columns ---------- */
+.dcol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.15;
+}
+.dcol__wd {
+  font-size: 12px;
+  font-weight: 800;
+}
+.dcol__md {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--tertiary-label);
+}
+.availcell--pitched {
+  background: var(--blue);
+  color: #fff;
+}
+
+/* ---------- roster editor ---------- */
+.rosterlist {
+  padding: var(--sp-2) var(--sp-3);
+}
+.rosteredit {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 6px 0;
+  border-bottom: 1px solid var(--separator);
+}
+.rosteredit:last-child {
+  border-bottom: none;
+}
+.rosteredit__num {
+  width: 58px;
+  flex-shrink: 0;
+  text-align: center;
+  padding: 9px 6px;
+}
+.rosteredit__name {
+  flex: 1;
+  padding: 9px 12px;
+}
+.rosteradd {
+  display: flex;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+}
+.rosteradd .field__input {
+  flex: 1;
+}

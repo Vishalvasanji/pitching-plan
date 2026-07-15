@@ -1,5 +1,5 @@
 /// <reference types="vitest" />
-import { defineConfig } from 'vitest/config';
+import { defineConfig, configDefaults } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 
 // GitHub Pages serves under /pitching-plan/ (the deploy workflow sets
@@ -12,5 +12,13 @@ export default defineConfig({
     globals: true,
     setupFiles: './src/test/setup.ts',
     css: false,
+    // Dormant World Series test suites — excluded along with their source.
+    exclude: [
+      ...configDefaults.exclude,
+      'src/test/availability.test.ts',
+      'src/test/bracket.test.ts',
+      'src/test/restRules.test.ts',
+      'src/test/app.test.tsx',
+    ],
   },
 });

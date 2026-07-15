@@ -21,5 +21,28 @@
 
     "types": ["vitest/globals", "@testing-library/jest-dom"]
   },
-  "include": ["src"]
+  "include": ["src"],
+  "//": "Dormant Gulf Coast World Series build — kept for reference, excluded from the tournament app.",
+  "exclude": [
+    "src/data/schedule.ts",
+    "src/data/brackets.ts",
+    "src/data/tournament.ts",
+    "src/data/games.ts",
+    "src/lib/engine/bracket.ts",
+    "src/lib/engine/availability.ts",
+    "src/lib/engine/restRules.ts",
+    "src/lib/engine/format.ts",
+    "src/components/BracketSelector.tsx",
+    "src/components/WorstCaseSummary.tsx",
+    "src/components/GamesBoard.tsx",
+    "src/components/GameCard.tsx",
+    "src/components/ResultToggle.tsx",
+    "src/components/AddPitcherSheet.tsx",
+    "src/components/AssignmentRow.tsx",
+    "src/components/RosterTable.tsx",
+    "src/test/availability.test.ts",
+    "src/test/bracket.test.ts",
+    "src/test/restRules.test.ts",
+    "src/test/app.test.tsx"
+  ]
 }

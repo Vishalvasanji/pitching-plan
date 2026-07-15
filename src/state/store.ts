@@ -1,128 +1,112 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { BracketId, GameResult, PlanData, RootState, Theme } from '../types';
-import { tracePath } from '../lib/engine/bracket';
+import type { Game, Player, RootState, Theme } from '../types';
+import { DEFAULT_ROSTER } from '../data/roster';
 
 const STORAGE_KEY = 'pitching-plan';
-const VERSION = 3;
-
-export const INITIAL_PLAN: PlanData = {
-  selectedBracket: 'red',
-  results: {},
-  assignments: [],
-};
+const VERSION = 4; // v4 = regular weekend tournament (innings). v1–3 were the WS build.
 
 interface Store extends RootState {
   setUser(name: string): void;
-  setBracket(b: BracketId): void;
-  setResult(gameId: string, result: GameResult | null): void;
-  addAssignment(gameId: string, playerId: string, pitches: number): void;
-  updateAssignmentPitches(id: string, pitches: number): void;
-  removeAssignment(id: string): void;
   setTheme(t: Theme): void;
-  resetPlan(): void;
+  setTournamentName(name: string): void;
+  addGame(game: { date: string; time?: string; opponent?: string }): void;
+  updateGame(id: string, patch: Partial<Omit<Game, 'id'>>): void;
+  removeGame(id: string): void;
+  addAssignment(gameId: string, playerId: string, outs: number): void;
+  updateAssignmentOuts(id: string, outs: number): void;
+  removeAssignment(id: string): void;
+  addPlayer(name: string): void;
+  updatePlayer(id: string, patch: Partial<Omit<Player, 'id'>>): void;
+  removePlayer(id: string): void;
+  resetTournament(): void;
 }
 
-function uid(): string {
+function uid(prefix = 'a'): string {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) return crypto.randomUUID();
-  return `a${Date.now()}-${Math.random().toString(36).slice(2)}`;
-}
-
-// Keep only the marks that lie on the actual traced route from the entry game.
-function prunedResults(
-  bracket: BracketId,
-  results: Record<string, GameResult>,
-): Record<string, GameResult> {
-  const trace = tracePath(bracket, results);
-  const next: Record<string, GameResult> = {};
-  for (const p of trace.played) next[p.gameId] = p.result;
-  return next;
+  return `${prefix}${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
 const initialRoot: RootState = {
   version: VERSION,
   userName: null,
-  plan: INITIAL_PLAN,
   theme: 'system',
+  tournamentName: '',
+  roster: DEFAULT_ROSTER,
+  games: [],
+  assignments: [],
 };
-
-/** The plan for the current device (stable reference until it changes). */
-export function activePlan(s: Store): PlanData {
-  return s.plan;
-}
 
 export const useStore = create<Store>()(
   persist(
     (set) => ({
       ...initialRoot,
       setUser: (name) => set(() => ({ userName: name.trim() || null })),
-      setBracket: (b) =>
-        set((s) => ({ plan: { ...s.plan, selectedBracket: b, results: {} } })),
-      setResult: (gameId, result) =>
-        set((s) => {
-          const results = { ...s.plan.results };
-          if (result === null) delete results[gameId];
-          else results[gameId] = result;
-          return { plan: { ...s.plan, results: prunedResults(s.plan.selectedBracket, results) } };
-        }),
-      addAssignment: (gameId, playerId, pitches) =>
+      setTheme: (t) => set(() => ({ theme: t })),
+      setTournamentName: (name) => set(() => ({ tournamentName: name })),
+
+      addGame: (game) =>
+        set((s) => ({ games: [...s.games, { id: uid('g'), ...game }] })),
+      updateGame: (id, patch) =>
+        set((s) => ({ games: s.games.map((g) => (g.id === id ? { ...g, ...patch } : g)) })),
+      removeGame: (id) =>
         set((s) => ({
-          plan: { ...s.plan, assignments: [...s.plan.assignments, { id: uid(), gameId, playerId, pitches }] },
+          games: s.games.filter((g) => g.id !== id),
+          assignments: s.assignments.filter((a) => a.gameId !== id),
         })),
-      updateAssignmentPitches: (id, pitches) =>
+
+      addAssignment: (gameId, playerId, outs) =>
         set((s) => ({
-          plan: { ...s.plan, assignments: s.plan.assignments.map((a) => (a.id === id ? { ...a, pitches } : a)) },
+          assignments: [...s.assignments, { id: uid(), gameId, playerId, outs }],
+        })),
+      updateAssignmentOuts: (id, outs) =>
+        set((s) => ({
+          assignments: s.assignments.map((a) => (a.id === id ? { ...a, outs } : a)),
         })),
       removeAssignment: (id) =>
+        set((s) => ({ assignments: s.assignments.filter((a) => a.id !== id) })),
+
+      addPlayer: (name) =>
+        set((s) => ({ roster: [...s.roster, { id: uid('r'), name: name.trim(), number: null }] })),
+      updatePlayer: (id, patch) =>
+        set((s) => ({ roster: s.roster.map((p) => (p.id === id ? { ...p, ...patch } : p)) })),
+      removePlayer: (id) =>
         set((s) => ({
-          plan: { ...s.plan, assignments: s.plan.assignments.filter((a) => a.id !== id) },
+          roster: s.roster.filter((p) => p.id !== id),
+          assignments: s.assignments.filter((a) => a.playerId !== id),
         })),
-      setTheme: (t) => set(() => ({ theme: t })),
-      resetPlan: () => set(() => ({ plan: INITIAL_PLAN })),
+
+      resetTournament: () => set(() => ({ games: [], assignments: [], tournamentName: '' })),
     }),
     {
       name: STORAGE_KEY,
       version: VERSION,
-      // Preserve data from older shapes so no one loses their plan.
+      // v1–v3 were the World Series build (a different data shape). There's no
+      // meaningful mapping to the tournament model, so start fresh but keep the
+      // coach's name and theme.
       migrate: (persisted, fromVersion) => {
-        const old = persisted as Record<string, unknown> | undefined;
-        if (!old) return persisted as RootState;
-
-        // v2: profiles map -> carry the active profile into the flat shape.
-        if (fromVersion === 2 && 'users' in old) {
-          const users = old.users as Record<string, { name: string; plan: PlanData }> | undefined;
-          const cu = (old.currentUser as string | null) ?? null;
-          const prof = cu && users ? users[cu] : undefined;
-          const name = prof?.name && prof.name !== 'My Plan' ? prof.name : null;
+        const old = (persisted ?? {}) as Record<string, unknown>;
+        if (fromVersion >= 4) {
           return {
+            ...initialRoot,
+            ...old,
             version: VERSION,
-            userName: name,
-            plan: prof?.plan ?? INITIAL_PLAN,
-            theme: (old.theme as Theme) ?? 'system',
-          } satisfies RootState;
+          } as RootState;
         }
-
-        // v1: flat single plan (no name) -> keep the plan, ask for a name.
-        if (fromVersion < 2 && 'selectedBracket' in old) {
-          return {
-            version: VERSION,
-            userName: null,
-            plan: {
-              selectedBracket: (old.selectedBracket as BracketId) ?? 'red',
-              results: (old.results as Record<string, GameResult>) ?? {},
-              assignments: (old.assignments as PlanData['assignments']) ?? [],
-            },
-            theme: (old.theme as Theme) ?? 'system',
-          } satisfies RootState;
-        }
-
-        return persisted as RootState;
+        return {
+          ...initialRoot,
+          userName: (old.userName as string | null) ?? null,
+          theme: (old.theme as Theme) ?? 'system',
+        } satisfies RootState;
       },
       partialize: (s) => ({
         version: s.version,
         userName: s.userName,
-        plan: s.plan,
         theme: s.theme,
+        tournamentName: s.tournamentName,
+        roster: s.roster,
+        games: s.games,
+        assignments: s.assignments,
       }),
     },
   ),

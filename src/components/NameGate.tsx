@@ -1,6 +1,5 @@
 import { useState, type FormEvent } from 'react';
 import { useStore } from '../state/store';
-import { TOURNAMENT_NAME } from '../data/tournament';
 
 export function NameGate({
   initialName = '',
@@ -23,7 +22,7 @@ export function NameGate({
     <div className="gate">
       <div className="gate__card card">
         <h1 className="gate__title">Pitching Plan</h1>
-        <p className="gate__sub">{TOURNAMENT_NAME}</p>
+        <p className="gate__sub">Weekend tournament pitching</p>
         <p className="gate__prompt">What's your first name?</p>
         <form className="gate__form" onSubmit={submit}>
           <input
