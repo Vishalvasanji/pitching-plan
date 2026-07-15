@@ -1128,3 +1128,67 @@ button {
 .rosteradd .field__input {
   flex: 1;
 }
+
+/* ---------- availability table: fits the viewport, squeezes columns, never scrolls sideways ---------- */
+.availwrap {
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  background: var(--card-bg);
+  overflow: hidden;
+}
+.availtable {
+  table-layout: fixed; /* date columns split the leftover width equally */
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.availtable th,
+.availtable td {
+  border-bottom: 1px solid var(--separator);
+  vertical-align: middle;
+}
+.availtable tbody tr:last-child td {
+  border-bottom: none;
+}
+.availtable thead th {
+  background: var(--card-bg-2);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--secondary-label);
+}
+.availtable tbody tr:nth-child(even) td {
+  background: var(--card-bg-2);
+}
+.availtable .col-name {
+  width: 118px; /* fixed; names wrap within it */
+  text-align: left;
+  padding: 8px 10px;
+}
+.availtable .player {
+  gap: 6px;
+  align-items: center;
+}
+.availtable .player__name {
+  font-size: 13.5px;
+  line-height: 1.15;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.availtable .acol {
+  width: auto;
+  text-align: center;
+  padding: 6px 3px;
+}
+.availtable .acol .dcol__wd {
+  font-size: 11px;
+}
+.availtable .acol .dcol__md {
+  font-size: 9.5px;
+}
+.availtable .availcell {
+  width: 100%;
+  min-width: 0;
+  height: 26px;
+  border-radius: 6px;
+  font-size: 12px;
+}

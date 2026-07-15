@@ -37,15 +37,15 @@ export function AvailabilityTable() {
   }
 
   return (
-    <div className="roster__scroll">
-      <table className="rtable">
+    <div className="availwrap">
+      <table className="availtable">
         <thead>
           <tr>
             <th className="col-name">Pitcher</th>
             {dates.map((d) => {
               const { wd, md } = dateParts(d);
               return (
-                <th key={d} className="col-dot">
+                <th key={d} className="acol">
                   <div className="dcol">
                     <span className="dcol__wd">{wd}</span>
                     <span className="dcol__md">{md}</span>
@@ -68,7 +68,7 @@ export function AvailabilityTable() {
                 </td>
                 {dates.map((d) => {
                   const s = byDate?.get(d);
-                  if (!s) return <td key={d} className="col-dot" />;
+                  if (!s) return <td key={d} className="acol" />;
                   const bad = s.violations.length > 0;
                   const cls =
                     s.kind === 'available'
@@ -77,7 +77,7 @@ export function AvailabilityTable() {
                         ? 'availcell--pitched'
                         : 'availcell--no';
                   return (
-                    <td key={d} className="col-dot">
+                    <td key={d} className="acol">
                       <div
                         className={`availcell ${cls} ${bad ? 'availcell--bad' : ''}`}
                         title={cellTitle(s)}
